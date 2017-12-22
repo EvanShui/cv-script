@@ -38,4 +38,7 @@ for (index, rect) in enumerate(rects):
     shape = predictor(gray, rect)
     shape = face_utils.shape_to_np(shape)
 
-    print(shape)
+    #convert dlib's rectangle to a OpenCV-style bounding box
+    (x, y, w, h) = face_utils.rect-to-bb(rect)
+    cv2.rectangle(image, (x,y), (x + w, y + h), (0, 255, 0), 2)
+    
