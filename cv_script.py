@@ -38,6 +38,10 @@ for (index, rect) in enumerate(rects):
     shape = predictor(gray, rect)
     shape = face_utils.shape_to_np(shape)
 
+    for(name, (i, j)) in face_utils.FACIAL_LANDMARKS_IDXS.items():
+        print(name)
+        print((i, j))
+
     #convert dlib's rectangle to a OpenCV-style bounding box
     (x, y, w, h) = face_utils.rect_to_bb(rect)
     cv2.rectangle(image, (x,y), (x + w, y + h), (0, 255, 0), 2)
@@ -48,10 +52,12 @@ for (index, rect) in enumerate(rects):
 
     #loop over the (x,y)-coordinates for the facial landmarks
     #and draw them on the images
-    print(shape)
     for(x, y) in shape:
         cv2.circle(image, (x,y), 1, (0, 0, 255), -1)
 
 #show the output image with the face detections + facial landmarks
+
+image = face_utils.visualize_facial_landmarks(image, shape)
+
 cv2.imshow("Output", image)
 cv2.waitKey(0)
