@@ -14,7 +14,7 @@ def average(matrix):
         sum_x += points[0, 0]
         sum_y += points[0, 1]
         counter += 1
-    return(sum_x / counter, sum_y / counter)
+    return(int(sum_x / counter), int(sum_y / counter))
 
 # constrcut argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -42,6 +42,8 @@ gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
 #creates a bounding box of faces for images (seems like it's a list)
 rects = detector(gray, 1)
 
+dict_points = {}
+
 #loop over face detections
 for (index, rect) in enumerate(rects):
     #determine the facial landmarks for the face region, then convert the
@@ -54,6 +56,9 @@ for (index, rect) in enumerate(rects):
         print(name)
         center_point_x, center_point_y = average(landmarks[i:j])
         print("center point x: ", center_point_x, "center point y: ", center_point_y)
+        #args img, center, radius, color
+        cv2.circle(image, (center_point_x, center_point_y), 5, (0,0,0), thickness=-1)
+        dict_points[name] = (center_point_x, center_point_y)
     shape = face_utils.shape_to_np(shape)
 
 
@@ -71,6 +76,12 @@ for (index, rect) in enumerate(rects):
         cv2.circle(image, (x,y), 1, (0, 0, 255), -1)
 
 #show the output image with the face detections + facial landmarks
+cv2.circle(image, (50,50), 100, (0, 0, 255), -1)
+print(dict_points)
+eyebrow_dist = (dict_points['left_eyebrow'][0] + dict_points['right_eyebrow'][0])/2
+eye_dist = (dict_points['left_eye'][0] + dict_points['right_eye'][0])/2
+print("eyebrow_dist: ", eyebrow_dist)
+print("eye_dist: ", eye_dist)
 
 image = face_utils.visualize_facial_landmarks(image, shape)
 
