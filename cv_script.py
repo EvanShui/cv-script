@@ -5,6 +5,17 @@ import imutils
 import dlib
 import cv2
 
+def average(matrix):
+    counter = 0
+    sum_x = 0
+    sum_y = 0
+    for points in matrix:
+        print("x: ", points[0, 0], "y: ", points[0, 1])
+        sum_x += points[0, 0]
+        sum_y += points[0, 1]
+        counter += 1
+    return(sum_x / counter, sum_y / counter)
+
 # constrcut argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-p", "--shape-predictor", required=True,
@@ -36,11 +47,15 @@ for (index, rect) in enumerate(rects):
     #determine the facial landmarks for the face region, then convert the
     #facial landmark (x, y)-coordinates to a NumPy array
     shape = predictor(gray, rect)
+    counter = 0
+    landmarks = np.matrix([[p.x, p.y] for p in predictor(gray, rect).parts()])
+    for(name, (i, j)) in face_utils.FACIAL_LANDMARKS_IDXS.items():
+        #center_point_x = sum(landmarks[i:j]) / len(landmarks[i:j])
+        print(name)
+        center_point_x, center_point_y = average(landmarks[i:j])
+        print("center point x: ", center_point_x, "center point y: ", center_point_y)
     shape = face_utils.shape_to_np(shape)
 
-    for(name, (i, j)) in face_utils.FACIAL_LANDMARKS_IDXS.items():
-        print(name)
-        print((i, j))
 
     #convert dlib's rectangle to a OpenCV-style bounding box
     (x, y, w, h) = face_utils.rect_to_bb(rect)
