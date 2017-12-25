@@ -64,7 +64,8 @@ for (index, rect) in enumerate(rects):
     (x, y, w, h) = face_utils.rect_to_bb(rect)
     cv2.rectangle(image, (x,y), (x + w, y + h), (0, 255, 0), 2)
     cv2.circle(image, (int((x + w / 2)), int((y + h / 2))), 10, (255, 0 , 0), thickness=-1)
-
+    for i in range(1, 4):
+        cv2.line(image, (int(x + i * (w / 4)), y), (int(x + i * (w / 4)), y + h), (0, 255, 0), thickness=2)
     #show face number
     cv2.putText(image, "Face #{}".format(index+1), (x-10, y-10),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
@@ -80,14 +81,15 @@ eyebrow_dist = int((dict_points['left_eyebrow'][0] + dict_points['right_eyebrow'
 eye_dist = int((dict_points['left_eye'][0] + dict_points['right_eye'][0])/2)
 nose_y_coord = dict_points['nose'][1]
 center_point = (int(width / 2), int(height / 2))
+print(x, y, w, h)
 print("eyebrow_dist: ", eyebrow_dist)
 print("eye_dist: ", eye_dist)
 print("nose: ", nose_y_coord)
 print("image height: ", height, "image width: ", width)
 print("box width: ", w / 4, "box height: ", h)
 print("init box x: ", x, "init box y: ", y)
-for i in range(1, 4):
-    cv2.line(image, (int(x + i * (w / 4)), y), (int(x + i * (w / 4)), y + h), (0, 255, 0), thickness=2)
+print("pt. 1: (", x + (w / 4), ", ", y, ")")
+cv2.circle(image, (x + w, y + h), 10, (0, 255, 0))
 cv2.circle(image, (eyebrow_dist, nose_y_coord), 5, (0,0,0), thickness=-1)
 cv2.circle(image, (eye_dist, nose_y_coord), 5, (0,0,0), thickness=-1)
 cv2.circle(image, center_point, 10, (0, 0, 255), thickness=-1)
