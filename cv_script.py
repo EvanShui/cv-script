@@ -63,6 +63,7 @@ for (index, rect) in enumerate(rects):
     #convert dlib's rectangle to a OpenCV-style bounding box
     (x, y, w, h) = face_utils.rect_to_bb(rect)
     cv2.rectangle(image, (x,y), (x + w, y + h), (0, 255, 0), 2)
+    cv2.circle(image, (int((x + w / 2)), int((y + h / 2))), 10, (255, 0 , 0), thickness=-1)
 
     #show face number
     cv2.putText(image, "Face #{}".format(index+1), (x-10, y-10),
@@ -83,6 +84,10 @@ print("eyebrow_dist: ", eyebrow_dist)
 print("eye_dist: ", eye_dist)
 print("nose: ", nose_y_coord)
 print("image height: ", height, "image width: ", width)
+print("box width: ", w / 4, "box height: ", h)
+print("init box x: ", x, "init box y: ", y)
+for i in range(1, 4):
+    cv2.line(image, (int(x + i * (w / 4)), y), (int(x + i * (w / 4)), y + h), (0, 255, 0), thickness=2)
 cv2.circle(image, (eyebrow_dist, nose_y_coord), 5, (0,0,0), thickness=-1)
 cv2.circle(image, (eye_dist, nose_y_coord), 5, (0,0,0), thickness=-1)
 cv2.circle(image, center_point, 10, (0, 0, 255), thickness=-1)
