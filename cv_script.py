@@ -63,24 +63,43 @@ for (index, rect) in enumerate(rects):
     #convert dlib's rectangle to a OpenCV-style bounding box
     (x, y, w, h) = face_utils.rect_to_bb(rect)
     cv2.rectangle(image, (x,y), (x + w, y + h), (0, 255, 0), 2)
-    cv2.circle(image, (int((x + w / 2)), int((y + h / 2))), 10, (255, 0 , 0), thickness=-1)
-    for i in range(1, 4):
-        cv2.line(image, (int(x + i * (w / 4)), y), (int(x + i * (w / 4)), y + h), (0, 255, 0), thickness=2)
+
+    #center point for the bounding box
+    #cv2.circle(image, (int((x + w / 2)), int((y + h / 2))), 10, (0, 255 , 0), thickness=-1)
+
+    #creates the bars of the photos
+    #for i in range(1, 4):
+    #    cv2.line(image, (int(x + i * (w / 4)), y), (int(x + i * (w / 4)), y + h), (0, 255, 0), thickness=2)
+
     #show face number
     cv2.putText(image, "Face #{}".format(index+1), (x-10, y-10),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
     #loop over the (x,y)-coordinates for the facial landmarks
     #and draw them on the images
-    for(x, y) in shape:
-        cv2.circle(image, (x,y), 1, (0, 0, 255), -1)
+    for(fl_x, fl_y) in shape:
+        cv2.circle(image, (fl_x,fl_y), 1, (0, 0, 255), -1)
 
 #show the output image with the face detections + facial landmarks
 print(dict_points)
+
+#calculate the distance between left/right facial landmarks
 eyebrow_dist = int((dict_points['left_eyebrow'][0] + dict_points['right_eyebrow'][0])/2)
 eye_dist = int((dict_points['left_eye'][0] + dict_points['right_eye'][0])/2)
+
+#create the 'Y' of face fl = facial landmark
+mapping_lst = [('left_eye', 'nose'), ('right_eye', 'nose'), ('nose', 'mouth'), ('left_eyebrow', 'left_eye'), ('right_eyebrow', 'right_eye')]
+for (fl1, fl2) in mapping_lst:
+    cv2.line(image, dict_points[fl1], dict_points[fl2], (0,255,0), thickness=2)
+
+#create the line that goes from nose to bottom of bb
+cv2.line(image, dict_points['nose'], (dict_points['nose'][0], y + h), (0, 255, 0), thickness=2)
+
+#calculate the center point of image
 nose_y_coord = dict_points['nose'][1]
 center_point = (int(width / 2), int(height / 2))
+
+#displaying info
 print(x, y, w, h)
 print("eyebrow_dist: ", eyebrow_dist)
 print("eye_dist: ", eye_dist)
@@ -89,12 +108,12 @@ print("image height: ", height, "image width: ", width)
 print("box width: ", w / 4, "box height: ", h)
 print("init box x: ", x, "init box y: ", y)
 print("pt. 1: (", x + (w / 4), ", ", y, ")")
-cv2.circle(image, (x + w, y + h), 10, (0, 255, 0))
+
+#creating circles for different data points
 cv2.circle(image, (eyebrow_dist, nose_y_coord), 5, (0,0,0), thickness=-1)
 cv2.circle(image, (eye_dist, nose_y_coord), 5, (0,0,0), thickness=-1)
-cv2.circle(image, center_point, 10, (0, 0, 255), thickness=-1)
+#cv2.circle(image, center_point, 10, (0, 0, 255), thickness=-1)
 
-#image = face_utils.visualize_facial_landmarks(image, shape)
-
+#display image
 cv2.imshow("Output", image)
 cv2.waitKey(0)
