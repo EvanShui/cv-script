@@ -25,9 +25,6 @@ ap.add_argument("-i", "--image", required=True,
 #maps the arg(shape-preidctor) to user input
 args = vars(ap.parse_args())
 
-print(args)
-
-
 #initailizes dlib's face detector to locate the face then
 #initialize the predictor to locate facial landmarks
 detector = dlib.get_frontal_face_detector()
@@ -36,6 +33,7 @@ predictor = dlib.shape_predictor(args["shape_predictor"])
 #preprocessing
 image = cv2.imread(args["image"])
 image = imutils.resize(image, width=500)
+height, width, channel = image.shape
 gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
 
 #converts image to greyscale
@@ -76,14 +74,20 @@ for (index, rect) in enumerate(rects):
         cv2.circle(image, (x,y), 1, (0, 0, 255), -1)
 
 #show the output image with the face detections + facial landmarks
-cv2.circle(image, (50,50), 100, (0, 0, 255), -1)
 print(dict_points)
-eyebrow_dist = (dict_points['left_eyebrow'][0] + dict_points['right_eyebrow'][0])/2
-eye_dist = (dict_points['left_eye'][0] + dict_points['right_eye'][0])/2
+eyebrow_dist = int((dict_points['left_eyebrow'][0] + dict_points['right_eyebrow'][0])/2)
+eye_dist = int((dict_points['left_eye'][0] + dict_points['right_eye'][0])/2)
+nose_y_coord = dict_points['nose'][1]
+center_point = (int(width / 2), int(height / 2))
 print("eyebrow_dist: ", eyebrow_dist)
 print("eye_dist: ", eye_dist)
+print("nose: ", nose_y_coord)
+print("image height: ", height, "image width: ", width)
+cv2.circle(image, (eyebrow_dist, nose_y_coord), 5, (0,0,0), thickness=-1)
+cv2.circle(image, (eye_dist, nose_y_coord), 5, (0,0,0), thickness=-1)
+cv2.circle(image, center_point, 10, (0, 0, 255), thickness=-1)
 
-image = face_utils.visualize_facial_landmarks(image, shape)
+#image = face_utils.visualize_facial_landmarks(image, shape)
 
 cv2.imshow("Output", image)
 cv2.waitKey(0)
