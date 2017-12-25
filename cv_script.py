@@ -4,6 +4,7 @@ import argparse
 import imutils
 import dlib
 import cv2
+import math
 
 def average(matrix):
     counter = 0
@@ -15,6 +16,13 @@ def average(matrix):
         sum_y += points[0, 1]
         counter += 1
     return(int(sum_x / counter), int(sum_y / counter))
+
+def dist(pt2, pt1):
+    y2 = pt2[1]
+    y1 = pt1[1]
+    x2 = pt2[0]
+    x1 = pt1[0]
+    math.sqrt((y2 - y1) ^ 2)
 
 # constrcut argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -88,12 +96,24 @@ eyebrow_dist = int((dict_points['left_eyebrow'][0] + dict_points['right_eyebrow'
 eye_dist = int((dict_points['left_eye'][0] + dict_points['right_eye'][0])/2)
 
 #create the 'Y' of face fl = facial landmark
-mapping_lst = [('left_eye', 'nose'), ('right_eye', 'nose'), ('nose', 'mouth'), ('left_eyebrow', 'left_eye'), ('right_eyebrow', 'right_eye')]
+mapping_lst = [('left_eye', 'nose'), ('right_eye', 'nose'), ('left_eyebrow', 'left_eye'), ('right_eyebrow', 'right_eye')] #('nose', 'mouth')
 for (fl1, fl2) in mapping_lst:
     cv2.line(image, dict_points[fl1], dict_points[fl2], (0,255,0), thickness=2)
 
 #create the line that goes from nose to bottom of bb
-cv2.line(image, dict_points['nose'], (dict_points['nose'][0], y + h), (0, 255, 0), thickness=2)
+cv2.line(image, dict_points['nose'], (dict_points['nose'][0], y + h), (0, 255, 0), thickness=1)
+
+
+#calculate slope of line between mouth and nose point.
+numer = (dict_points['mouth'][1] - dict_points['nose'][1])
+denom = (dict_points['mouth'][0] - dict_points['nose'][0])
+slope = int(numer / denom)
+print("slope: ", slope)
+
+#calculate point if mouth and nose extend to bb
+#y + w is the height of the bounding box relative to the base of the image
+nose_mouth_bbx = int(((slope * dict_points['nose'][0] - dict_points['nose'][1]) + (y + w)) / slope)
+cv2.line(image, dict_points['nose'], (int(nose_mouth_bbx), (y + w)), (0, 255, 0), thickness=1)
 
 #calculate the center point of image
 nose_y_coord = dict_points['nose'][1]
